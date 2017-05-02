@@ -1,5 +1,6 @@
 from django.db import models
-from .user import User
+from django.contrib.auth.models import User
 
-class Professor(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+class Professor(User):
+    pass
+    # user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='users')

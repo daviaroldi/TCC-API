@@ -1,4 +1,4 @@
-from .user import User
+from .user import *
 from .student import Student
 from .professor import Professor
 from .session import Session
