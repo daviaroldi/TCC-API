@@ -35,6 +35,7 @@ class SessionSerializer(serializers.ModelSerializer):
     class Meta:
         model = Session
         fields = ('code', 'deadline', 'professor', 'students')
+        extra_kwargs = {'code': {'read_only': True}}
 
     def create(self, validated_data):
         professor = Professor.objects.filter(id=validated_data['id'])
@@ -42,4 +43,5 @@ class SessionSerializer(serializers.ModelSerializer):
             deadline=validated_data['deadline'],
             professor=professor
         )
-        session.
+        session.save()
+        return session

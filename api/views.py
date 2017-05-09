@@ -1,18 +1,12 @@
 from django.shortcuts import render
-from django.http import HttpResponse, JsonResponse
+from django.http import JsonResponse
 from rest_framework.response import Response
-
-from rest_framework.decorators import api_view, authentication_classes, permission_classes
-from rest_framework.authentication import TokenAuthentication
-from rest_framework.permissions import IsAuthenticated
-from django.conf import settings
-from django.db.models.signals import post_save
-from django.dispatch import receiver
-from rest_framework.authtoken.models import Token
+from rest_framework.decorators import api_view, authentication_classes, permission_classes, parser_classes
+from rest_framework.parsers import JSONParser
 from .models import *
 
 from rest_framework import viewsets
-from .Serializers import ProfessorSerializer, StudentSerializer
+from .Serializers import ProfessorSerializer, StudentSerializer, SessionSerializer
 
 class ProfessorViewSet(viewsets.ModelViewSet):
     queryset = Professor.objects.all().order_by('-username')
@@ -32,9 +26,26 @@ class StudentViewSet(viewsets.ModelViewSet):
         serializer = self.get_serializer(recent_users, many=True)
         return Response(serializer.data)
 #
-# class UserViewSet(viewsets.ModelViewSet):
-#     queryset = User.objects.all().order_by('-username')
-#     serializer_class = UserSerializer
+class SessionViewSet(viewsets.ModelViewSet):
+    queryset = Session.objects.all().order_by('-deadline')
+    serializer_class = Session
+
+    def create(self, request, *args, **kwargs):
+        params = request.data
+        deadline = params['deadline']
+        professor = Professor.objects.get(id=params['professor'])
+        session = Session(
+            professor=professor,
+            deadline=deadline,
+        )
+        session.save()
+
+        serializer = SessionSerializer(session)
+
+        response = Response(serializer.data)
+        # response.set_cookie('Authorization', 'Token ' + token.key)
+
+        return response
 
 # @api_view(['GET'])
 # @authentication_classes((SessionAuthentication, BasicAuthentication))
@@ -55,11 +66,21 @@ def login(request):
 
     return response
 
-@api_view(['POST'])
-def createSession(request):
-    # token = Token.objects.create(user=request.user)
-    print(request)
-    response = JsonResponse({'token': 'teste'})
-    # response.set_cookie('Authorization', 'Token ' + token.key)
-
-    return response
+# @api_view(['POST'])
+# @parser_classes((JSONParser,))
+# def createSession(request, format=None):
+#     params = request.data
+#     deadline = params['deadline']
+#     professor = Professor.objects.get(id=params['professor'])
+#     session = Session(
+#         professor=professor,
+#         deadline=deadline,
+#     )
+#     session.save()
+#
+#     serializer = SessionSerializer(session)
+#
+#     response = JsonResponse({'session': serializer.data})
+#     # response.set_cookie('Authorization', 'Token ' + token.key)
+#
+#     return response
