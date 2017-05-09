@@ -1,5 +1,7 @@
 from django.shortcuts import render
 from django.http import HttpResponse, JsonResponse
+from rest_framework.response import Response
+
 from rest_framework.decorators import api_view, authentication_classes, permission_classes
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.permissions import IsAuthenticated
@@ -26,7 +28,9 @@ class StudentViewSet(viewsets.ModelViewSet):
     @authentication_classes([])
     @permission_classes([])
     def list(self, request, *args, **kwargs):
-        pass
+        recent_users = Student.objects.all().order_by('-id')
+        serializer = self.get_serializer(recent_users, many=True)
+        return Response(serializer.data)
 #
 # class UserViewSet(viewsets.ModelViewSet):
 #     queryset = User.objects.all().order_by('-username')
@@ -47,6 +51,15 @@ class StudentViewSet(viewsets.ModelViewSet):
 def login(request):
     token = Token.objects.create(user=request.user)
     response = JsonResponse({'token': token.key})
-    response.set_cookie('Authorization', 'Token ' + token.key)
+    # response.set_cookie('Authorization', 'Token ' + token.key)
+
+    return response
+
+@api_view(['POST'])
+def createSession(request):
+    # token = Token.objects.create(user=request.user)
+    print(request)
+    response = JsonResponse({'token': 'teste'})
+    # response.set_cookie('Authorization', 'Token ' + token.key)
 
     return response

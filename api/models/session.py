@@ -3,7 +3,11 @@ from .professor import Professor
 from .student import Student
 
 class Session(models.Model):
-    code = models.CharField(max_length=255)
+    code = models.AutoField(primary_key=False)
     deadline = models.DateTimeField()
     professor = models.ForeignKey(Professor, on_delete=models.DO_NOTHING)
-    student = models.ManyToManyField(Student)
+    students = models.ManyToManyField(Student)
+
+    def save(self, *args, **kwargs):
+        # self.code =
+        super(Session, self).save(*args, **kwargs)
