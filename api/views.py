@@ -19,8 +19,8 @@ class StudentViewSet(viewsets.ModelViewSet):
     queryset = Student.objects.all().order_by('-username')
     serializer_class = StudentSerializer
 
-    @authentication_classes([])
-    @permission_classes([])
+    permission_classes_by_action = {'create': [AllowAny]
+                                    'list': [IsAdminUser]}
     def list(self, request, *args, **kwargs):
         recent_users = Student.objects.all().order_by('-id')
         serializer = self.get_serializer(recent_users, many=True)
@@ -48,7 +48,7 @@ class SessionViewSet(viewsets.ModelViewSet):
         return response
 
 # @api_view(['GET'])
-# @authentication_classes((SessionAuthentication, BasicAuthentication))
+# @authentication_classes((SessionAuthentication, BasicAuthentication))aut
 # @permission_classes((IsAuthenticated))
 # def index(request, format=None):
 #     content = {
