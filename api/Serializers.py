@@ -34,8 +34,17 @@ class SessionSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Session
-        fields = ('code', 'deadline', 'professor', 'students')
+        fields = ('code', 'deadline', 'professor', 'students', 'questions')
         extra_kwargs = {'code': {'read_only': True}}
+
+    def professor(self, obj):
+        professor = Professor.objects.get(obj.professor)
+        return {
+            'professor': {
+                'name': professor.first_name + ' ' + professor.last_name,
+                'id': professor.id
+            }
+        }
 
     def create(self, validated_data):
         professor = Professor.objects.filter(id=validated_data['id'])
@@ -44,4 +53,6 @@ class SessionSerializer(serializers.ModelSerializer):
             professor=professor
         )
         session.save()
-        return session
+        return {
+            "code": session.code
+        }

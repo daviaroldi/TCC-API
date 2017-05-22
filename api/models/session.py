@@ -15,8 +15,3 @@ class Session(models.Model):
         code = hexlify(os.urandom(5))
         self.code = code
         super(Session, self).save(*args, **kwargs)
-
-        # ef
-        # _createHash():
-        # """This function generate 10 character long hash"""
-        # return hexlify(os.urandom(5))

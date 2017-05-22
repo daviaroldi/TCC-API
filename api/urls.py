@@ -16,6 +16,6 @@ urlpatterns = [
     # url(r'', index, name='index'),
     # url(r'login/', login, name='login'),
     url(r'', include(router.urls)),
-    url(r'login/', views.obtain_auth_token),
+    url(r'login', views.obtain_auth_token),
     # url(r'create-session/', createSession, name='createSession'),
 ]
