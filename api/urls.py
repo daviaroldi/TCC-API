@@ -14,7 +14,8 @@ router.register(r'session', SessionViewSet)
 
 urlpatterns = [
     # url(r'', index, name='index'),
-    # url(r'login/', login, name='login'),
+    url(r'user-info', current_user, name='current_user'),
+    # url(r'get-sessions', get_sessions, name='get_sessions'),
     url(r'', include(router.urls)),
     url(r'login', views.obtain_auth_token),
     # url(r'create-session/', createSession, name='createSession'),

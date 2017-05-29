@@ -55,8 +55,42 @@ MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',
 ]
 
+PIPELINE = {
+    'PIPELINE_ENABLED': True,
+    'JAVASCRIPT': {
+        'stats': {
+            'source_filenames': (
+              'js/jquery.js',
+              'js/d3.js',
+              'js/collections/*.js',
+              'js/application.js',
+            ),
+            'output_filename': 'js/stats.js',
+        }
+    }
+}
 
 CORS_ORIGIN_ALLOW_ALL = True
+
+CORS_ALLOW_CREDENTIALS = True
+
+CORS_ALLOW_HEADERS = (
+    'accept',
+    'accept-encoding',
+    'authorization',
+    'content-type',
+    'dnt',
+    'origin',
+    'user-agent',
+    'x-csrftoken',
+    'x-requested-with',
+    'Authorization',
+)
+
+CORS_ORIGIN_REGEX_WHITELIST = (
+    'localhost:8100',
+    'http://localhost:8100',
+)
 
 ROOT_URLCONF = 'tcc.urls'
 
