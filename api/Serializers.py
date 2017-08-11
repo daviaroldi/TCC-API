@@ -48,11 +48,17 @@ class StudentSerializer(serializers.ModelSerializer):
         student.save()
         return student
 
+class QuestionSerializer(serializers.ModelSerializer):
+    # session = SessionSerializer()
+
+    class Meta:
+        model = Question
+        fields = ('id', 'description')
 
 class SessionSerializer(serializers.ModelSerializer):
     students = StudentSerializer(read_only=True, many=True)
     professor = ProfessorSerializer(read_only=True)
-    # questions = QuestionSerializer(read_only=True)
+    questions = QuestionSerializer(read_only=True, many=True)
 
     class Meta:
         model = Session
@@ -85,5 +91,3 @@ class SessionSerializer(serializers.ModelSerializer):
             "id": session.id,
             "code": session.code
         }
-
-    # def list(self, params):

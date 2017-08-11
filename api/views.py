@@ -9,7 +9,7 @@ from .models import *
 import json
 
 from rest_framework import viewsets
-from .Serializers import ProfessorSerializer, StudentSerializer, SessionSerializer
+from .Serializers import ProfessorSerializer, StudentSerializer, SessionSerializer, QuestionSerializer
 
 class ProfessorViewSet(viewsets.ModelViewSet):
     queryset = Professor.objects.all().order_by('-username')
@@ -43,6 +43,26 @@ class SessionViewSet(viewsets.ModelViewSet):
         session.save()
 
         serializer = SessionSerializer(session)
+
+        response = Response(serializer.data)
+        # response.set_cookie('Authorization', 'Token ' + token.key)
+
+        return response
+
+class QuestionViewSet(viewsets.ModelViewSet):
+    queryset = Question.objects.all().order_by('id')
+    serializer_class = QuestionSerializer
+
+    def create(self, request, *args, **kwargs):
+        params = request.data
+        session = Session.objects.get(id=params['session'])
+        question = Question(
+            description=params['description'],
+            session=session
+        )
+        question.save()
+
+        serializer = QuestionSerializer(question)
 
         response = Response(serializer.data)
         # response.set_cookie('Authorization', 'Token ' + token.key)
