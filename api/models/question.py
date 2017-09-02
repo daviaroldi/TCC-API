@@ -1,6 +1,8 @@
 from django.db import models
 from .session import Session
-from .type import Type
+# from .type import Type
+
+
 
 class Question(models.Model):
     description = models.TextField()
