@@ -12,6 +12,7 @@ router.register(r'professors', ProfessorViewSet)
 router.register(r'students', StudentViewSet)
 router.register(r'session', SessionViewSet)
 router.register(r'question', QuestionViewSet)
+router.register(r'answers', AnswerViewSet)
 
 urlpatterns = [
     # url(r'', index, name='index'),

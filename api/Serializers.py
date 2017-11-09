@@ -48,12 +48,56 @@ class StudentSerializer(serializers.ModelSerializer):
         student.save()
         return student
 
+class OptionSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Option
+        fields = ('id', 'label')
+
 class QuestionSerializer(serializers.ModelSerializer):
-    # session = SessionSerializer()
+    options = OptionSerializer(read_only=True, many=True)
 
     class Meta:
         model = Question
-        fields = ('id', 'description')
+        fields = ('id', 'description', 'type', 'options')
+
+    def create(self, validated_data):
+        question = Question(
+            description=validated_data['description'],
+            type=validated_data['type'],
+        )
+        # question.is_superuser = True
+        # question.set_password(validated_data['password'])
+        question.save()
+        #
+        options = []
+        for opt in validated_data['options']:
+            option = Option(
+                label=opt['label'],
+                question_id=question.id
+            )
+            option.save()
+
+        # return {
+        #     "id": question.id,
+        #     "description": question.description,
+        #     "type": question.type
+        # }
+        return {
+            "type": validated_data['type']
+        }
+
+    def update(self, instance, validated_data):
+        """
+        Update and return an existing `Snippet` instance, given the validated data.
+        """
+        instance.description = validated_data.get('description', instance.description)
+        instance.type = validated_data.get('type', instance.type)
+        # for opt in validated_data.get('options', instance.options):
+        # print(validated_data)
+        instance.save()
+        return instance
+
+
 
 class SessionSerializer(serializers.ModelSerializer):
     students = StudentSerializer(read_only=True, many=True)
@@ -62,7 +106,7 @@ class SessionSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Session
-        fields = ('id', 'code', 'name', 'deadline', 'professor', 'students', 'questions', 'is_open')
+        fields = ('id', 'code', 'name', 'deadline', 'professor', 'students', 'questions', 'started_at', 'is_open')
         extra_kwargs = {'code': {'read_only': True}, 'is_open': {'read_only': True}}
 
     # def students(self, obj):
@@ -91,3 +135,12 @@ class SessionSerializer(serializers.ModelSerializer):
             "id": session.id,
             "code": session.code
         }
+
+class AnswerSerializer(serializers.ModelSerializer):
+    option = OptionSerializer(read_only=True)
+    question = QuestionSerializer(read_only=True)
+
+    class Meta:
+        model = Answer
+        fields = ('id', 'value', 'option', 'question')
+        extra_kwargs = {'id': {'read_only': True}}
