@@ -139,8 +139,9 @@ class SessionSerializer(serializers.ModelSerializer):
 class AnswerSerializer(serializers.ModelSerializer):
     option = OptionSerializer(read_only=True)
     question = QuestionSerializer(read_only=True)
+    student = StudentSerializer(read_only=True)
 
     class Meta:
         model = Answer
-        fields = ('id', 'value', 'option', 'question')
+        fields = ('id', 'value', 'option', 'question', 'student')
         extra_kwargs = {'id': {'read_only': True}}

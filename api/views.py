@@ -181,18 +181,25 @@ class QuestionViewSet(viewsets.ModelViewSet):
         return response
 
 class AnswerViewSet(viewsets.ModelViewSet):
-    queryset = Answer.objects.all().order_by('id')
+    queryset = Answer.objects.all()
     serializer_class = AnswerSerializer
 
-# @api_view(['GET'])
-# @authentication_classes((SessionAuthentication, BasicAuthentication))aut
-# @permission_classes((IsAuthenticated))
-# def index(request, format=None):
-#     content = {
-#         'user': unicode(request.user),  # `django.contrib.auth.User` instance.
-#         'auth': unicode(request.auth),  # None
-#     }
-#     return JsonResponse(content)
+    def list(self, request, *args, **kwargs):
+        params = request.GET
+        answers = Answer.objects.all()
+        if ('question' in params):
+            answers = answers.filter(question=params['question'])
+            if ('type' in params and params['type'] == 'chart'):
+                result = Option.objects.filter(answer__in=answers).select_related().values('label').annotate(value_count=models.Count('answer'))
+                print(result)
+            else:
+                serializer = self.get_serializer(answers, many=True)
+                result = serializer.data
+
+        response = Response(result)
+        return response
+
+
 @api_view(['GET'])
 def current_user(request):
     user = request.user
