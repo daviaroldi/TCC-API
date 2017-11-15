@@ -19,8 +19,9 @@ class Session(models.Model):
     students = models.ManyToManyField(Student)
 
     def save(self, *args, **kwargs):
-        code = hexlify(os.urandom(5))
-        self.code = code
+        if (not self.id):
+            code = hexlify(os.urandom(5))
+            self.code = code
         super(Session, self).save(*args, **kwargs)
 
     def is_open(self):

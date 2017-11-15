@@ -17,6 +17,7 @@ router.register(r'answers', AnswerViewSet)
 urlpatterns = [
     # url(r'', index, name='index'),
     url(r'user-info', current_user, name='current_user'),
+    url(r'session-connect', connect_session, name='connect_session'),
     # url(r'get-sessions', get_sessions, name='get_sessions'),
     url(r'', include(router.urls)),
     url(r'login', views.obtain_auth_token),

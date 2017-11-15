@@ -70,6 +70,7 @@ class SessionViewSet(viewsets.ModelViewSet):
 
         if ('student' in params):
             sessions = sessions.filter(students__pk=params['student'])
+        print(sessions)
         serializer = self.get_serializer(sessions, many=True)
         return Response(serializer.data)
 
@@ -191,12 +192,44 @@ class AnswerViewSet(viewsets.ModelViewSet):
             answers = answers.filter(question=params['question'])
             if ('type' in params and params['type'] == 'chart'):
                 result = Option.objects.filter(answer__in=answers).select_related().values('label').annotate(value_count=models.Count('answer'))
-                print(result)
             else:
+                if ('student' in params):
+                    student = Student.objects.get(id=params['student'])
+                    answers = answers.filter(student=student)
                 serializer = self.get_serializer(answers, many=True)
                 result = serializer.data
 
         response = Response(result)
+        return response
+
+    def create(self, request, *args, **kwargs):
+        params = request.data
+        student = Student.objects.get(id=params['student'])
+        question = Question.objects.get(id=params['question'])
+        option = None
+        if ('option' in params):
+            option = Option.objects.get(id=params['option'])
+
+        if ('id' in params and params['id']):
+            answer = Answer.objects.get(id=params['id'])
+            answer.student = student
+            answer.question = question
+            answer.value = params['value']
+            answer.option = option
+        else:
+            answer = Answer(
+                student=student,
+                question=question,
+                value=params['value'],
+                option=option
+            )
+
+        answer.save()
+
+        serializer = AnswerSerializer(answer)
+
+        response = Response(serializer.data)
+
         return response
 
 
@@ -217,6 +250,32 @@ def login(request):
     token = Token.objects.create(user=request.user)
     response = JsonResponse({'token': token.key})
     # response.set_cookie('Authorization', 'Token ' + token.key)
+
+    return response
+
+@api_view(['POST'])
+def connect_session(request):
+    params = request.data
+    if ('code' in params):
+        session = Session.objects.get(code=params['code'], deadline__gte=datetime.now())
+
+        if (not session):
+            return JsonResponse({'error': True, 'message': 'Sessão inválida!'})
+    else:
+        return JsonResponse({'error': True, 'message': 'Sessão inválida!'})
+
+    if ('student' in params):
+        student = Student.objects.get(id=params['student'])
+
+        if (not student):
+            return JsonResponse({'error': True, 'message': 'Aluno inválido!'})
+    else:
+        return JsonResponse({'error': True, 'message': 'Aluno inválido!'})
+
+
+    session = session.students.add(student)
+
+    response = JsonResponse({'code': session.code, 'student': student.id})
 
     return response
 

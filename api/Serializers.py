@@ -98,7 +98,6 @@ class QuestionSerializer(serializers.ModelSerializer):
         return instance
 
 
-
 class SessionSerializer(serializers.ModelSerializer):
     students = StudentSerializer(read_only=True, many=True)
     professor = ProfessorSerializer(read_only=True)
