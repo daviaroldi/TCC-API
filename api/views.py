@@ -70,7 +70,7 @@ class SessionViewSet(viewsets.ModelViewSet):
 
         if ('student' in params):
             sessions = sessions.filter(students__pk=params['student'])
-        print(sessions)
+        
         serializer = self.get_serializer(sessions, many=True)
         return Response(serializer.data)
 
@@ -273,7 +273,7 @@ def connect_session(request):
         return JsonResponse({'error': True, 'message': 'Aluno inválido!'})
 
 
-    session = session.students.add(student)
+    session.students.add(student)
 
     response = JsonResponse({'code': session.code, 'student': student.id})
 
